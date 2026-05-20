@@ -74,31 +74,6 @@
             margin-top: 2px;
         }
 
-        /* ─── Stats ─── */
-        .stats {
-            display: flex;
-            background: #fff;
-            border-bottom: 1.5px solid var(--gray-100);
-            flex-shrink: 0;
-        }
-        .stat-card {
-            flex: 1;
-            text-align: center;
-            padding: 7px 4px 6px;
-        }
-        .stat-card + .stat-card { border-left: 1.5px solid var(--gray-100); }
-        .stat-num {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--gray-900);
-            line-height: 1;
-        }
-        .stat-label {
-            font-size: 10px;
-            color: var(--gray-400);
-            margin-top: 3px;
-            font-weight: 500;
-        }
 
         /* ─── Bus area ─── */
         .bus-area {
@@ -492,21 +467,6 @@
         <p>랜덤 배정 버튼을 눌러 좌석을 배치하세요</p>
     </div>
 
-    <!-- Stats -->
-    <div class="stats">
-        <div class="stat-card">
-            <div class="stat-num" id="st-total">0</div>
-            <div class="stat-label">총 인원</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-num" id="st-assigned">0</div>
-            <div class="stat-label">배정 완료</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-num" id="st-remain">0</div>
-            <div class="stat-label">미배정</div>
-        </div>
-    </div>
 
     <!-- Bus Seat Map -->
     <div class="bus-area" id="capture-area">
