@@ -641,22 +641,27 @@ function shuffle(arr) {
 function randomAssign() {
     if (!people.length) { showToast('인원을 먼저 등록해주세요'); return; }
 
-    const normal = [], back = [];
+    // 앞→뒤 행 순서대로 좌석 목록 구성
+    const normalOrdered = [], backOrdered = [];
     LAYOUT.forEach(row => {
         const seats = [...row.L, ...row.R];
-        if      (row.type === 'normal') normal.push(...seats);
-        else if (row.type === 'back')   back.push(...seats);
+        if      (row.type === 'normal') normalOrdered.push(...seats);
+        else if (row.type === 'back')   backOrdered.push(...seats);
     });
 
-    const sp = shuffle(people);
-    const sn = shuffle(normal);
-    const sb = shuffle(back);
+    const n = people.length;
 
-    // 최종 배정 결과 계산
+    // 인원 수만큼만 앞자리부터 사용 → 빈자리는 항상 뒤로
+    const seatsToUse = n <= normalOrdered.length
+        ? normalOrdered.slice(0, n)
+        : [...normalOrdered, ...backOrdered.slice(0, n - normalOrdered.length)];
+
+    // 선택된 좌석과 이름을 각각 셔플 → 이름은 랜덤, 빈자리는 뒤쪽
+    const shuffledSeats  = shuffle(seatsToUse);
+    const shuffledPeople = shuffle(people);
+
     const final = {};
-    let i = 0;
-    sn.forEach(s => { if (i < sp.length) final[s] = sp[i++]; });
-    sb.forEach(s => { if (i < sp.length) final[s] = sp[i++]; });
+    shuffledSeats.forEach((seat, i) => { final[seat] = shuffledPeople[i]; });
 
     // 빈 그리드로 초기화
     assignments = {};
