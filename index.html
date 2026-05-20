@@ -452,13 +452,15 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ─── Pop animation ─── */
-        @keyframes pop {
-            0%   { transform: scale(0.7); opacity: 0.3; }
-            65%  { transform: scale(1.06); }
-            100% { transform: scale(1); opacity: 1; }
+        /* ─── Cascade animation ─── */
+        @keyframes cascade {
+            0%   { transform: translateY(-16px) scale(0.75); opacity: 0; }
+            55%  { transform: translateY(4px) scale(1.07); opacity: 1; }
+            100% { transform: translateY(0) scale(1); }
         }
-        .seat.pop { animation: pop 0.28s ease forwards; }
+        .seat.cascade {
+            animation: cascade 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
     </style>
 </head>
 <body>
@@ -650,24 +652,36 @@ function randomAssign() {
     const sn = shuffle(normal);
     const sb = shuffle(back);
 
-    assignments = {};
+    // 최종 배정 결과 계산
+    const final = {};
     let i = 0;
-    sn.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
-    sb.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
+    sn.forEach(s => { if (i < sp.length) final[s] = sp[i++]; });
+    sb.forEach(s => { if (i < sp.length) final[s] = sp[i++]; });
 
+    // 빈 그리드로 초기화
+    assignments = {};
     buildGrid();
-    updateStats();
 
-    Object.keys(assignments).forEach((s, idx) => {
-        const el = document.getElementById('s' + s);
-        if (!el) return;
+    // 좌석 번호 순 정렬 → 위→아래 파도 효과
+    const ordered = Object.keys(final).map(Number).sort((a, b) => a - b);
+
+    ordered.forEach((seatNum, idx) => {
         setTimeout(() => {
-            el.classList.add('pop');
-            el.addEventListener('animationend', () => el.classList.remove('pop'), { once: true });
-        }, idx * 15);
-    });
+            assignments[seatNum] = final[seatNum];
+            const rowData = LAYOUT.find(r => [...r.L, ...r.R].includes(seatNum));
+            const el = document.getElementById('s' + seatNum);
+            if (!el || !rowData) return;
 
-    showToast('좌석 배정이 완료되었습니다');
+            renderSeat(el, seatNum, rowData.type);
+            el.classList.add('cascade');
+            el.addEventListener('animationend', () => el.classList.remove('cascade'), { once: true });
+
+            if (idx === ordered.length - 1) {
+                updateStats();
+                showToast('좌석 배정이 완료되었습니다');
+            }
+        }, 50 + idx * 28);
+    });
 }
 
 function resetAll() {
