@@ -285,14 +285,17 @@
         }
         .btn:active { transform: scale(0.96); opacity: 0.85; }
 
-        .btn-primary {
+        .btn-primary,
+        .btn-secondary {
+            background: #fff;
+            color: var(--gray-900);
+            border: 1.5px solid var(--gray-200);
+        }
+        .btn-primary:active,
+        .btn-secondary:active {
             background: var(--blue);
             color: #fff;
-        }
-        .btn-secondary {
-            background: var(--blue-lt);
-            color: var(--blue);
-            border: 1.5px solid var(--blue-bd);
+            border-color: var(--blue);
         }
 
         /* ─── Bottom Sheet ─── */
