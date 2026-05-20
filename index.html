@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>랜덤 좌석 배정</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --blue:    #2563eb;
+            --blue-dk: #1d4ed8;
+            --blue-lt: #eff6ff;
+            --blue-bd: #bfdbfe;
+            --gray-50: #f9fafb;
+            --gray-100:#f3f4f6;
+            --gray-200:#e5e7eb;
+            --gray-300:#d1d5db;
+            --gray-400:#9ca3af;
+            --gray-600:#4b5563;
+            --gray-900:#111827;
+            --amber:   #f59e0b;
+            --amber-lt:#fffbeb;
+            --amber-bd:#fcd34d;
+            --red:     #ef4444;
+            --red-lt:  #fef2f2;
+            --red-bd:  #fecaca;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: var(--gray-100);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #fff;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            background: #fff;
+            padding: 10px 18px 9px;
+            flex-shrink: 0;
+            border-bottom: 1.5px solid var(--gray-100);
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+            display: inline-block;
+        }
+        .header h1::after {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 3.5px;
+            background: var(--blue);
+            border-radius: 2px;
+            margin: 5px auto 0;
+        }
+        .header p {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        /* ─── Stats ─── */
+        .stats {
+            display: flex;
+            background: #fff;
+            border-bottom: 1.5px solid var(--gray-100);
+            flex-shrink: 0;
+        }
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            padding: 7px 4px 6px;
+        }
+        .stat-card + .stat-card { border-left: 1.5px solid var(--gray-100); }
+        .stat-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: var(--gray-400);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        /* ─── Bus area ─── */
+        .bus-area {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            padding: 5px 0 2px;
+        }
+
+        .bus-indicator { display: none; }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 3px 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+            padding: 0 10px;
+        }
+        .leg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        .leg-dot {
+            width: 12px; height: 12px;
+            border-radius: 3px;
+            border: 1.5px solid transparent;
+            flex-shrink: 0;
+        }
+
+        /* ─── Seat Grid ─── */
+        .seat-grid {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 0 10px;
+        }
+
+        .seat-row {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .row-num {
+            width: 16px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 5px;
+        }
+
+        .seat-group {
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+        }
+
+        .aisle-gap {
+            width: 28px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .aisle-gap::after {
+            content: '';
+            width: 1.5px;
+            height: 55%;
+            background: var(--gray-200);
+            border-radius: 1px;
+        }
+
+        /* ─── Seat ─── */
+        .seat {
+            flex: 1;
+            min-width: 0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--gray-200);
+            background: #fff;
+            transition: transform 0.1s;
+            cursor: default;
+            padding: 3px 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .seat:active { transform: scale(0.91); }
+
+        .s-num {
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--gray-400);
+        }
+        .s-name {
+            font-size: clamp(10px, 3vw, 13px);
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 3px;
+            word-break: keep-all;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .s-sub {
+            font-size: 8px;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        /* ─── Seat States ─── */
+
+        /* 앞줄 비움 */
+        .s-front {
+            background: var(--gray-50);
+            border-color: var(--gray-200);
+        }
+        .s-front .s-num { color: var(--gray-300); }
+        .s-front .s-sub { color: var(--gray-300); }
+
+        /* 빈 좌석 (일반) */
+        .s-empty {
+            background: #fff;
+            border-color: var(--gray-200);
+        }
+        .s-empty .s-num { color: var(--gray-600); }
+
+        /* 빈 좌석 (맨 뒷줄) */
+        .s-back {
+            background: var(--amber-lt);
+            border-color: var(--amber-bd);
+            border-style: dashed;
+        }
+        .s-back .s-num { color: var(--amber); }
+
+        /* 배정된 좌석 (일반) */
+        .s-on {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+        .s-on .s-num { color: rgba(255,255,255,0.6); }
+
+        /* 배정된 좌석 (맨 뒷줄) */
+        .s-back-on {
+            background: var(--amber);
+            border-color: var(--amber);
+        }
+        .s-back-on .s-num  { color: rgba(255,255,255,0.6); }
+        .s-back-on .s-name { color: #fff; }
+
+        /* ─── Hover / Touch 효과 ─── */
+        .seat.s-empty:hover,
+        .seat.s-back:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            border-style: solid;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .seat.s-empty:hover .s-num,
+        .seat.s-back:hover .s-num {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Bus bottom */
+        .bus-bottom { display: none; }
+
+        /* ─── Controls ─── */
+        .controls {
+            flex-shrink: 0;
+            padding: 7px 12px 18px;
+            border-top: 1.5px solid var(--gray-100);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .btn-row { display: flex; gap: 6px; }
+
+        .btn {
+            flex: 1;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            letter-spacing: -0.2px;
+            transition: opacity 0.12s, transform 0.12s;
+        }
+        .btn:active { transform: scale(0.96); opacity: 0.85; }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+        .btn-secondary {
+            background: var(--blue-lt);
+            color: var(--blue);
+            border: 1.5px solid var(--blue-bd);
+        }
+
+        /* ─── Bottom Sheet ─── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 200;
+            align-items: flex-end;
+        }
+        .overlay.open { display: flex; }
+
+        .sheet {
+            background: #fff;
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            border-radius: 20px 20px 0 0;
+            padding: 10px 16px 32px;
+            max-height: 78vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.22s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .sheet-handle {
+            width: 36px; height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin: 0 auto 14px;
+        }
+        .sheet-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .sheet-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+        .sheet-close {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--gray-600);
+            font-weight: 700;
+        }
+        .sheet-close:active { opacity: 0.7; }
+
+        .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .name-input {
+            flex: 1;
+            height: 46px;
+            padding: 0 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            font-family: inherit;
+            color: var(--gray-900);
+            transition: border-color 0.15s;
+        }
+        .name-input:focus { border-color: var(--blue); }
+        .add-btn {
+            height: 46px;
+            padding: 0 18px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .add-btn:active { background: var(--blue-dk); }
+
+        .people-meta {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .people-meta.warn { color: var(--red); }
+
+        .people-list {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .person-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border: 1.5px solid var(--gray-200);
+        }
+        .person-n {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .del-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--red-lt);
+            color: var(--red);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .del-btn:active { opacity: 0.7; }
+        .empty-msg {
+            text-align: center;
+            color: var(--gray-300);
+            font-size: 14px;
+            padding: 28px;
+        }
+
+        /* ─── Toast ─── */
+        .toast {
+            position: fixed;
+            bottom: 82px;
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background: rgba(17,24,39,0.88);
+            color: #fff;
+            padding: 9px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.2s;
+            z-index: 999;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ─── Pop animation ─── */
+        @keyframes pop {
+            0%   { transform: scale(0.7); opacity: 0.3; }
+            65%  { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .seat.pop { animation: pop 0.28s ease forwards; }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>랜덤 좌석 배정</h1>
+        <p>랜덤 배정 버튼을 눌러 좌석을 배치하세요</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-num" id="st-total">0</div>
+            <div class="stat-label">총 인원</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" id="st-assigned">0</div>
+            <div class="stat-label">배정 완료</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" id="st-remain">0</div>
+            <div class="stat-label">미배정</div>
+        </div>
+    </div>
+
+    <!-- Bus Seat Map -->
+    <div class="bus-area" id="capture-area">
+        <div class="bus-indicator">앞 (운전석)</div>
+
+        <div class="legend">
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--gray-50);border-color:var(--gray-200);"></div>
+                앞줄 비움
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:#fff;border-color:var(--gray-200);"></div>
+                빈 좌석
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--blue);border-color:var(--blue);"></div>
+                배정됨
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--amber-lt);border-color:var(--amber-bd);border-style:dashed;"></div>
+                맨 뒷줄
+            </div>
+        </div>
+
+        <div class="seat-grid" id="seat-grid"></div>
+
+        <div class="bus-bottom">↓ 뒤</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="btn-row">
+            <button class="btn btn-primary"   onclick="randomAssign()">랜덤 배정</button>
+            <button class="btn btn-secondary" onclick="resetAll()">초기화</button>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-secondary" onclick="openSheet()">인원 관리</button>
+            <button class="btn btn-secondary" onclick="saveImg()">이미지 저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- People Sheet -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+    <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+            <div class="sheet-title">인원 관리</div>
+            <button class="sheet-close" onclick="closeSheet()">✕</button>
+        </div>
+        <div class="input-row">
+            <input class="name-input" id="name-input" type="text"
+                   placeholder="이름 입력 (최대 6자)" maxlength="6"
+                   onkeydown="if(event.key==='Enter')addPerson()">
+            <button class="add-btn" onclick="addPerson()">추가</button>
+        </div>
+        <div class="people-meta" id="people-meta"></div>
+        <div class="people-list" id="people-list"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LAYOUT = [
+    { r:1,  L:[1,2],   R:[3,4],      type:'front'  },
+    { r:2,  L:[5,6],   R:[7,8],      type:'front'  },
+    { r:3,  L:[9,10],  R:[11,12],    type:'normal' },
+    { r:4,  L:[13,14], R:[15,16],    type:'normal' },
+    { r:5,  L:[17,18], R:[19,20],    type:'normal' },
+    { r:6,  L:[21,22], R:[23,24],    type:'normal' },
+    { r:7,  L:[25,26], R:[27,28],    type:'normal' },
+    { r:8,  L:[29,30], R:[31,32],    type:'normal' },
+    { r:9,  L:[33,34], R:[35,36],    type:'normal' },
+    { r:10, L:[37,38], R:[39,40],    type:'normal' },
+    { r:11, L:[41,42], R:[43,44,45], type:'back'   },
+];
+
+let people = [
+    '박민수','김명수','김다현','권나현','최해련','여다은','배한결','양사랑',
+    '현성은','하은비','이주연','김동건','김서연','이재연','손효슬','김영서',
+    '박순호','서유빈','박수지','이은이','김대근','배재현','박효정','장수인',
+    '이지원','남민지','안성모','이재석','김도연','류지민'
+];
+
+let assignments = {};
+
+/* ─── Grid ─── */
+function buildGrid() {
+    const grid = document.getElementById('seat-grid');
+    grid.innerHTML = '';
+    LAYOUT.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'seat-row';
+
+        const rn = document.createElement('div');
+        rn.className = 'row-num';
+        rn.textContent = row.r;
+        rowEl.appendChild(rn);
+
+        // 왼쪽 그룹: flex = 좌석수 → 오른쪽과 비례 배분 → 모든 좌석 동일 너비
+        const lg = document.createElement('div');
+        lg.className = 'seat-group';
+        lg.style.flex = row.L.length;
+        row.L.forEach(n => lg.appendChild(makeSeat(n, row.type)));
+        rowEl.appendChild(lg);
+
+        const ag = document.createElement('div');
+        ag.className = 'aisle-gap';
+        rowEl.appendChild(ag);
+
+        const rg = document.createElement('div');
+        rg.className = 'seat-group';
+        rg.style.flex = row.R.length;
+        row.R.forEach(n => rg.appendChild(makeSeat(n, row.type)));
+        rowEl.appendChild(rg);
+
+        grid.appendChild(rowEl);
+    });
+}
+
+function makeSeat(num, type) {
+    const el = document.createElement('div');
+    el.id = 's' + num;
+    renderSeat(el, num, type);
+    return el;
+}
+
+function renderSeat(el, num, type) {
+    el.className = 'seat';
+    el.innerHTML = '';
+    const name = assignments[num];
+
+    const numEl = document.createElement('div');
+    numEl.className = 's-num';
+    numEl.textContent = num;
+    el.appendChild(numEl);
+
+    if (type === 'front') {
+        el.classList.add('s-front');
+        const sub = document.createElement('div');
+        sub.className = 's-sub';
+        sub.style.color = 'var(--gray-300)';
+        sub.textContent = '비움';
+        el.appendChild(sub);
+    } else if (name) {
+        el.classList.add(type === 'back' ? 's-back-on' : 's-on');
+        const nm = document.createElement('div');
+        nm.className = 's-name';
+        nm.textContent = name;
+        el.appendChild(nm);
+    } else {
+        el.classList.add(type === 'back' ? 's-back' : 's-empty');
+    }
+}
+
+/* ─── Random assign ─── */
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function randomAssign() {
+    if (!people.length) { showToast('인원을 먼저 등록해주세요'); return; }
+
+    const normal = [], back = [];
+    LAYOUT.forEach(row => {
+        const seats = [...row.L, ...row.R];
+        if      (row.type === 'normal') normal.push(...seats);
+        else if (row.type === 'back')   back.push(...seats);
+    });
+
+    const sp = shuffle(people);
+    const sn = shuffle(normal);
+    const sb = shuffle(back);
+
+    assignments = {};
+    let i = 0;
+    sn.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
+    sb.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
+
+    buildGrid();
+    updateStats();
+
+    Object.keys(assignments).forEach((s, idx) => {
+        const el = document.getElementById('s' + s);
+        if (!el) return;
+        setTimeout(() => {
+            el.classList.add('pop');
+            el.addEventListener('animationend', () => el.classList.remove('pop'), { once: true });
+        }, idx * 15);
+    });
+
+    showToast('좌석 배정이 완료되었습니다');
+}
+
+function resetAll() {
+    assignments = {};
+    buildGrid();
+    updateStats();
+    showToast('초기화 되었습니다');
+}
+
+/* ─── Stats ─── */
+function updateStats() {
+    const assigned = Object.keys(assignments).length;
+    document.getElementById('st-total').textContent    = people.length;
+    document.getElementById('st-assigned').textContent = assigned;
+    document.getElementById('st-remain').textContent   = Math.max(0, people.length - assigned);
+}
+
+/* ─── Sheet ─── */
+function openSheet() {
+    document.getElementById('overlay').classList.add('open');
+    renderPeople();
+    setTimeout(() => document.getElementById('name-input').focus(), 280);
+}
+function closeSheet() { document.getElementById('overlay').classList.remove('open'); }
+function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeSheet(); }
+
+function renderPeople() {
+    const list = document.getElementById('people-list');
+    const meta = document.getElementById('people-meta');
+    const n = people.length;
+
+    meta.textContent = `${n}명 등록됨`;
+    meta.className = 'people-meta' + (n > 32 ? ' warn' : '');
+    if (n > 32) meta.textContent += ' — 뒷줄 좌석이 사용됩니다';
+
+    if (!n) { list.innerHTML = '<div class="empty-msg">등록된 인원이 없습니다</div>'; return; }
+
+    list.innerHTML = people.map((name, i) => `
+        <div class="person-item">
+            <span class="person-n">${i + 1}. ${name}</span>
+            <button class="del-btn" onclick="removePerson(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function addPerson() {
+    const input = document.getElementById('name-input');
+    const name  = input.value.trim();
+    if (!name) { showToast('이름을 입력하세요'); return; }
+    if (people.includes(name)) { showToast('이미 등록된 이름입니다'); input.select(); return; }
+    people.push(name);
+    input.value = '';
+    renderPeople();
+    updateStats();
+    showToast(`${name} 추가됨`);
+}
+
+function removePerson(idx) {
+    const name = people[idx];
+    people.splice(idx, 1);
+    for (const seat in assignments) {
+        if (assignments[seat] === name) delete assignments[seat];
+    }
+    renderPeople();
+    buildGrid();
+    updateStats();
+    showToast(`${name} 삭제됨`);
+}
+
+/* ─── Save image ─── */
+async function saveImg() {
+    showToast('이미지 생성 중...');
+    try {
+        const el     = document.getElementById('capture-area');
+        const canvas = await html2canvas(el, {
+            scale: 2.5, backgroundColor: '#ffffff', useCORS: true, logging: false,
+        });
+        const dataUrl = canvas.toDataURL('image/png');
+        const isIOS   = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        if (isIOS) {
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width,initial-scale=1">
+                <title>좌석 배정표</title></head>
+                <body style="margin:0;background:#fff;text-align:center">
+                <p style="padding:14px;font-size:14px;color:#666;font-weight:500">이미지를 길게 눌러 저장하세요</p>
+                <img src="${dataUrl}" style="max-width:100%;display:block;margin:0 auto">
+                </body></html>`);
+            win.document.close();
+            showToast('이미지를 길게 눌러 저장하세요');
+        } else {
+            const d  = new Date();
+            const fn = `좌석배정_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.png`;
+            const a  = document.createElement('a');
+            a.download = fn;
+            a.href = dataUrl;
+            a.click();
+            showToast('이미지 저장 완료');
+        }
+    } catch(e) {
+        showToast('저장에 실패했습니다');
+        console.error(e);
+    }
+}
+
+/* ─── Toast ─── */
+let toastTimer;
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    clearTimeout(toastTimer);
+    el.textContent = msg;
+    el.classList.add('show');
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+buildGrid();
+updateStats();
+</script>
+</body>
+</html>
