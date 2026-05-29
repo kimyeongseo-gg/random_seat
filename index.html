@@ -11,6 +11,9 @@
             --blue-dk: #1d4ed8;
             --blue-lt: #eff6ff;
             --blue-bd: #bfdbfe;
+            --sky:     #38bdf8;
+            --sky-lt:  #f0f9ff;
+            --sky-bd:  #bae6fd;
             --gray-50: #f9fafb;
             --gray-100:#f3f4f6;
             --gray-200:#e5e7eb;
@@ -161,7 +164,7 @@
 
         .seat-row {
             flex: 1;
-            min-height: 0;
+            min-height: 36px;
             display: flex;
             align-items: stretch;
         }
@@ -212,31 +215,30 @@
             background: #fff;
             transition: transform 0.1s;
             cursor: default;
-            padding: 3px 2px;
+            padding: 5px 2px;
             overflow: hidden;
             position: relative;
+            gap: 3px;
         }
         .seat:active { transform: scale(0.6); }
 
         .s-num {
-            font-size: 8px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             line-height: 1;
             color: var(--gray-300);
         }
         .s-name {
-            font-size: clamp(10px, 3vw, 13px);
+            font-size: clamp(11px, 3vw, 14px);
             font-weight: 800;
             text-align: center;
-            line-height: 1.2;
-            margin-top: 3px;
+            line-height: 1.3;
             word-break: keep-all;
             color: #fff;
             letter-spacing: -0.3px;
         }
         .s-sub {
-            font-size: 8px;
-            margin-top: 2px;
+            font-size: 9px;
             font-weight: 600;
         }
 
@@ -300,7 +302,9 @@
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            border: none;
+            border: 1.5px solid var(--sky-bd);
+            background: var(--sky-lt);
+            color: var(--sky);
             font-family: inherit;
             letter-spacing: -0.2px;
             transition: opacity 0.12s, transform 0.12s;
@@ -308,18 +312,19 @@
         .btn:active { transform: scale(0.96); opacity: 0.85; }
 
         .btn-primary {
-            background: var(--blue);
-            color: #fff;
+            background: var(--sky-lt);
+            color: var(--sky);
+            border: 1.5px solid var(--sky-bd);
         }
         .btn-reset {
-            background: var(--red-lt);
-            color: var(--red);
-            border: 1.5px solid var(--red-bd);
+            background: var(--sky-lt);
+            color: var(--sky);
+            border: 1.5px solid var(--sky-bd);
         }
         .btn-people {
-            background: var(--blue-lt);
-            color: var(--blue);
-            border: 1.5px solid var(--blue-bd);
+            background: var(--sky-lt);
+            color: var(--sky);
+            border: 1.5px solid var(--sky-bd);
         }
 
         /* ─── Bottom Sheet ─── */
@@ -486,9 +491,9 @@
         .s-pinned .s-sub  { color: rgba(255,255,255,0.65); font-size: 7px; }
 
         .btn-pin {
-            background: var(--green-lt);
-            color: var(--green);
-            border: 1.5px solid var(--green-bd);
+            background: var(--sky-lt);
+            color: var(--sky);
+            border: 1.5px solid var(--sky-bd);
         }
 
         .pin-select {
@@ -601,22 +606,6 @@
                 <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
         </button>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats">
-        <div class="stat-card">
-            <div class="stat-num" id="st-total">0</div>
-            <div class="stat-label">총 인원</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-num" id="st-assigned">0</div>
-            <div class="stat-label">배정 완료</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-num" id="st-remain">0</div>
-            <div class="stat-label">미배정</div>
-        </div>
     </div>
 
     <!-- Bus Seat Map -->
@@ -883,12 +872,7 @@ function resetAll() {
 }
 
 /* ─── Stats ─── */
-function updateStats() {
-    const assigned = Object.keys(assignments).length + Object.keys(pinned).length;
-    document.getElementById('st-total').textContent    = people.length;
-    document.getElementById('st-assigned').textContent = assigned;
-    document.getElementById('st-remain').textContent   = Math.max(0, people.length - assigned);
-}
+function updateStats() {}
 
 /* ─── Sheet ─── */
 function openSheet() {
