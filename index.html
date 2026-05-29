@@ -218,12 +218,12 @@
             padding: 5px 2px;
             overflow: hidden;
             position: relative;
-            gap: 3px;
+            gap: 5px;
         }
         .seat:active { transform: scale(0.6); }
 
         .s-num {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             line-height: 1;
             color: var(--gray-300);
@@ -286,46 +286,35 @@
         /* ─── Controls ─── */
         .controls {
             flex-shrink: 0;
-            padding: 9px 12px 22px;
+            padding: 10px 14px 24px;
             border-top: 1.5px solid var(--gray-100);
             background: #fff;
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 8px;
         }
-        .btn-row { display: flex; gap: 7px; }
+        .btn-row { display: flex; gap: 8px; }
 
         .btn {
             flex: 1;
-            height: 48px;
-            border-radius: 12px;
+            height: 50px;
+            border-radius: 14px;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            border: 1.5px solid var(--sky-bd);
-            background: var(--sky-lt);
-            color: var(--sky);
+            border: 1.8px solid #1d4ed8;
+            background: #fff;
+            color: #1d4ed8;
             font-family: inherit;
             letter-spacing: -0.2px;
-            transition: opacity 0.12s, transform 0.12s;
+            transition: background 0.13s, color 0.13s, transform 0.1s;
         }
-        .btn:active { transform: scale(0.96); opacity: 0.85; }
+        .btn:active { transform: scale(0.96); }
 
-        .btn-primary {
-            background: var(--sky-lt);
-            color: var(--sky);
-            border: 1.5px solid var(--sky-bd);
-        }
-        .btn-reset {
-            background: var(--sky-lt);
-            color: var(--sky);
-            border: 1.5px solid var(--sky-bd);
-        }
-        .btn-people {
-            background: var(--sky-lt);
-            color: var(--sky);
-            border: 1.5px solid var(--sky-bd);
-        }
+        .btn-primary:active  { background: var(--blue);  color: #fff; border-color: var(--blue);  }
+        .btn-reset:active    { background: var(--red);   color: #fff; border-color: var(--red);   }
+        .btn-people:active   { background: var(--blue);  color: #fff; border-color: var(--blue);  }
+        .btn-pin:active      { background: var(--green); color: #fff; border-color: var(--green); }
 
         /* ─── Bottom Sheet ─── */
         .overlay {
@@ -491,9 +480,9 @@
         .s-pinned .s-sub  { color: rgba(255,255,255,0.65); font-size: 7px; }
 
         .btn-pin {
-            background: var(--sky-lt);
-            color: var(--sky);
-            border: 1.5px solid var(--sky-bd);
+            background: #fff;
+            color: #1d4ed8;
+            border: 1.8px solid #1d4ed8;
         }
 
         .pin-select {
@@ -643,8 +632,8 @@
     <!-- Controls -->
     <div class="controls">
         <div class="btn-row">
-            <button class="btn btn-primary" style="flex:2" onclick="randomAssign()">랜덤 배정</button>
-            <button class="btn btn-reset"   style="flex:1" onclick="resetAll()">초기화</button>
+            <button class="btn btn-primary" onclick="randomAssign()">랜덤 배정</button>
+            <button class="btn btn-reset"   onclick="resetAll()">초기화</button>
         </div>
         <div class="btn-row">
             <button class="btn btn-pin"    onclick="openPinSheet()">자리 고정</button>
