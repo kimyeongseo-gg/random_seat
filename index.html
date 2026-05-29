@@ -6,37 +6,40 @@
     <title>랜덤 좌석 배정</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        @import url('https://cdn.jsdelivr.net/npm/pretendard@latest/dist/web/static/pretendard-dynamic-subset.css');
+
         :root {
-            --blue:    #2563eb;
-            --blue-dk: #1d4ed8;
-            --blue-lt: #eff6ff;
-            --blue-bd: #bfdbfe;
-            --sky:     #38bdf8;
-            --sky-lt:  #f0f9ff;
-            --sky-bd:  #bae6fd;
-            --gray-50: #f9fafb;
-            --gray-100:#f3f4f6;
-            --gray-200:#e5e7eb;
-            --gray-300:#d1d5db;
-            --gray-400:#9ca3af;
-            --gray-600:#4b5563;
-            --gray-900:#111827;
-            --amber:   #f59e0b;
-            --amber-lt:#fffbeb;
-            --amber-bd:#fcd34d;
-            --red:     #ef4444;
-            --red-lt:  #fef2f2;
-            --red-bd:  #fecaca;
-            --green:   #16a34a;
-            --green-lt:#f0fdf4;
-            --green-bd:#bbf7d0;
+            --primary:    #3182F6;
+            --primary-dk: #1C6FE8;
+            --primary-lt: #EBF3FF;
+            --amber:      #F5A623;
+            --amber-lt:   #FFF0CC;
+            --red:        #F04452;
+            --green:      #12B886;
+            --green-lt:   #E6FCF5;
+            --gray-50:    #F9FAFB;
+            --gray-100:   #F2F4F6;
+            --gray-200:   #E5E8EB;
+            --gray-300:   #C2C7CF;
+            --gray-400:   #9EA6B2;
+            --gray-600:   #4E5968;
+            --gray-800:   #1F2D3D;
+            /* legacy aliases used in JS-generated HTML */
+            --blue:       #3182F6;
+            --blue-dk:    #1C6FE8;
+            --blue-lt:    #EBF3FF;
+            --blue-bd:    #BFDBFE;
+            --amber-bd:   #F5D58A;
+            --red-lt:     #FFE8EA;
+            --red-bd:     #FFC9CC;
+            --green-bd:   #A3E9D0;
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
-            background: var(--gray-100);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: var(--gray-50);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -53,68 +56,41 @@
         /* ─── Header ─── */
         .header {
             background: #fff;
-            padding: 16px 18px 12px;
+            padding: 18px 20px 14px;
             flex-shrink: 0;
-            border-bottom: 1.5px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .header-text { text-align: center; flex: 1; }
         .header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--gray-900);
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--gray-800);
             letter-spacing: -0.5px;
         }
         .header p {
             font-size: 12px;
             color: var(--gray-400);
-            margin-top: 2px;
+            margin-top: 3px;
+            font-weight: 400;
         }
         .btn-save-icon {
             width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 1.5px solid var(--blue-bd);
-            background: var(--blue-lt);
-            color: var(--blue);
-            font-size: 18px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-lt);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             flex-shrink: 0;
-            transition: opacity 0.12s, transform 0.12s;
+            transition: background 0.12s, transform 0.1s;
         }
-        .btn-save-icon:active { transform: scale(0.92); opacity: 0.8; }
+        .btn-save-icon:active { transform: scale(0.91); background: #d6e8ff; }
         .header-spacer { width: 38px; flex-shrink: 0; }
-
-        /* ─── Stats ─── */
-        .stats {
-            display: flex;
-            background: #fff;
-            border-bottom: 1.5px solid var(--gray-100);
-            flex-shrink: 0;
-        }
-        .stat-card {
-            flex: 1;
-            text-align: center;
-            padding: 10px 4px 9px;
-            background: #fff;
-        }
-        .stat-card + .stat-card { border-left: 1.5px solid var(--gray-100); }
-        .stat-num {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--blue);
-            line-height: 1;
-        }
-        .stat-label {
-            font-size: 10px;
-            color: var(--blue);
-            margin-top: 3px;
-            font-weight: 500;
-        }
 
         /* ─── Bus area ─── */
         .bus-area {
@@ -123,32 +99,30 @@
             display: flex;
             flex-direction: column;
             background: #fff;
-            padding: 8px 0 3px;
+            padding: 10px 0 4px;
         }
-
 
         /* Legend */
         .legend {
             display: flex;
-            gap: 4px 12px;
+            gap: 4px 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             flex-shrink: 0;
-            padding: 0 10px;
+            padding: 0 20px;
         }
         .leg {
             display: flex;
             align-items: center;
             gap: 5px;
             font-size: 10px;
-            color: var(--gray-600);
+            color: var(--gray-400);
             font-weight: 500;
         }
         .leg-dot {
-            width: 12px; height: 12px;
-            border-radius: 3px;
-            border: 1.5px solid transparent;
+            width: 10px; height: 10px;
+            border-radius: 4px;
             flex-shrink: 0;
         }
 
@@ -158,37 +132,37 @@
             min-height: 0;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            padding: 0 10px;
+            gap: 5px;
+            padding: 0 20px;
         }
 
         .seat-row {
             flex: 1;
-            min-height: 36px;
+            min-height: 38px;
             display: flex;
             align-items: stretch;
         }
 
         .row-num {
-            width: 16px;
+            width: 14px;
             font-size: 9px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--gray-300);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            margin-right: 5px;
+            margin-right: 6px;
         }
 
         .seat-group {
             display: flex;
-            gap: 4px;
+            gap: 5px;
             align-items: stretch;
         }
 
         .aisle-gap {
-            width: 18px;
+            width: 16px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -196,8 +170,8 @@
         }
         .aisle-gap::after {
             content: '';
-            width: 1.5px;
-            height: 60%;
+            width: 1px;
+            height: 50%;
             background: var(--gray-200);
             border-radius: 1px;
         }
@@ -206,13 +180,13 @@
         .seat {
             flex: 1;
             min-width: 0;
-            border-radius: 10px;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--gray-200);
-            background: #fff;
+            border: none;
+            background: var(--gray-100);
             transition: transform 0.1s;
             cursor: default;
             padding: 5px 2px;
@@ -223,14 +197,14 @@
         .seat:active { transform: scale(0.6); }
 
         .s-num {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 600;
             line-height: 1;
             color: var(--gray-300);
         }
         .s-name {
-            font-size: clamp(11px, 3vw, 14px);
-            font-weight: 800;
+            font-size: clamp(10px, 2.8vw, 13px);
+            font-weight: 700;
             text-align: center;
             line-height: 1.3;
             word-break: keep-all;
@@ -244,50 +218,49 @@
 
         /* ─── Seat States ─── */
 
-        /* 앞줄 비움 */
         .s-front {
-            background: var(--gray-50);
-            border-color: var(--gray-200);
+            background: var(--gray-100);
         }
         .s-front .s-num { color: var(--gray-300); }
         .s-front .s-sub { color: var(--gray-300); }
 
-        /* 빈 좌석 (일반) */
         .s-empty {
-            background: #fff;
-            border-color: var(--gray-200);
+            background: var(--gray-100);
         }
         .s-empty .s-num { color: var(--gray-300); }
 
-        /* 빈 좌석 (맨 뒷줄) */
         .s-back {
             background: var(--amber-lt);
-            border-color: var(--amber-bd);
-            border-style: dashed;
+            box-shadow: inset 3px 0 0 var(--amber);
         }
         .s-back .s-num { color: var(--amber); }
 
-        /* 배정된 좌석 (일반) */
         .s-on {
-            background: var(--blue);
-            border-color: var(--blue);
+            background: var(--primary);
+            box-shadow: 0 2px 8px rgba(49,130,246,0.30);
         }
-        .s-on .s-num { color: rgba(255,255,255,0.55); }
+        .s-on .s-num { color: rgba(255,255,255,0.6); }
 
-        /* 배정된 좌석 (맨 뒷줄) */
         .s-back-on {
             background: var(--amber);
-            border-color: var(--amber);
+            box-shadow: 0 2px 8px rgba(245,166,35,0.35);
         }
-        .s-back-on .s-num  { color: rgba(255,255,255,0.55); }
+        .s-back-on .s-num  { color: rgba(255,255,255,0.6); }
         .s-back-on .s-name { color: #fff; }
 
+        .s-pinned {
+            background: var(--green);
+            box-shadow: 0 2px 8px rgba(18,184,134,0.30);
+        }
+        .s-pinned .s-num  { color: rgba(255,255,255,0.6); }
+        .s-pinned .s-name { color: #fff; }
+        .s-pinned .s-sub  { color: rgba(255,255,255,0.7); font-size: 8px; }
 
         /* ─── Controls ─── */
         .controls {
             flex-shrink: 0;
-            padding: 10px 14px 24px;
-            border-top: 1.5px solid var(--gray-100);
+            padding: 10px 20px 28px;
+            border-top: 1px solid var(--gray-100);
             background: #fff;
             display: flex;
             flex-direction: column;
@@ -297,31 +270,32 @@
 
         .btn {
             flex: 1;
-            height: 50px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 700;
+            height: 52px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            border: 1.8px solid #1d4ed8;
+            border: 1.5px solid var(--primary);
             background: #fff;
-            color: #1d4ed8;
+            color: var(--primary);
             font-family: inherit;
             letter-spacing: -0.2px;
-            transition: background 0.13s, color 0.13s, transform 0.1s;
+            transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
         }
-        .btn:active { transform: scale(0.96); }
+        .btn:active { transform: scale(0.97); }
 
-        .btn-primary:active  { background: var(--blue);  color: #fff; border-color: var(--blue);  }
-        .btn-reset:active    { background: var(--red);   color: #fff; border-color: var(--red);   }
-        .btn-people:active   { background: var(--blue);  color: #fff; border-color: var(--blue);  }
-        .btn-pin:active      { background: var(--green); color: #fff; border-color: var(--green); }
+        .btn-primary:active { background: var(--primary);  color: #fff; border-color: var(--primary); }
+        .btn-reset:active   { background: var(--red);      color: #fff; border-color: var(--red);     }
+        .btn-people:active  { background: var(--primary);  color: #fff; border-color: var(--primary); }
+        .btn-pin            { border-color: var(--primary); color: var(--primary); }
+        .btn-pin:active     { background: var(--green);    color: #fff; border-color: var(--green);   }
 
         /* ─── Bottom Sheet ─── */
         .overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
             z-index: 200;
             align-items: flex-end;
         }
@@ -332,8 +306,8 @@
             width: 100%;
             max-width: 430px;
             margin: 0 auto;
-            border-radius: 20px 20px 0 0;
-            padding: 10px 16px 32px;
+            border-radius: 24px 24px 0 0;
+            padding: 12px 20px 36px;
             max-height: 78vh;
             display: flex;
             flex-direction: column;
@@ -348,21 +322,21 @@
             width: 36px; height: 4px;
             background: var(--gray-200);
             border-radius: 2px;
-            margin: 0 auto 14px;
+            margin: 0 auto 16px;
         }
         .sheet-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .sheet-title {
             font-size: 17px;
-            font-weight: 800;
-            color: var(--gray-900);
+            font-weight: 700;
+            color: var(--gray-800);
         }
         .sheet-close {
-            width: 30px; height: 30px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             border: none;
             background: var(--gray-100);
@@ -370,40 +344,45 @@
             cursor: pointer;
             color: var(--gray-600);
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .sheet-close:active { opacity: 0.7; }
 
         .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
         .name-input {
             flex: 1;
-            height: 46px;
-            padding: 0 14px;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 14px;
             font-size: 15px;
             outline: none;
             font-family: inherit;
-            color: var(--gray-900);
+            color: var(--gray-800);
+            background: #fff;
             transition: border-color 0.15s;
         }
-        .name-input:focus { border-color: var(--blue); }
+        .name-input:focus { border-color: var(--primary); }
         .add-btn {
-            height: 46px;
-            padding: 0 18px;
-            background: var(--blue);
+            height: 48px;
+            padding: 0 20px;
+            background: var(--primary);
             color: #fff;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             white-space: nowrap;
+            transition: background 0.12s;
         }
-        .add-btn:active { background: var(--blue-dk); }
+        .add-btn:active { background: var(--primary-dk); }
 
         .people-meta {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--gray-400);
             margin-bottom: 10px;
             font-weight: 500;
@@ -421,45 +400,47 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 14px;
+            padding: 13px 16px;
             background: var(--gray-50);
-            border-radius: 12px;
-            border: 1.5px solid var(--gray-200);
+            border-radius: 14px;
         }
         .person-n {
             font-size: 14px;
             font-weight: 600;
-            color: var(--gray-900);
+            color: var(--gray-800);
         }
         .del-btn {
             width: 28px; height: 28px;
             border-radius: 50%;
             border: none;
-            background: var(--red-lt);
+            background: #FFE8EA;
             color: var(--red);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .del-btn:active { opacity: 0.7; }
         .empty-msg {
             text-align: center;
             color: var(--gray-300);
             font-size: 14px;
-            padding: 28px;
+            padding: 32px;
         }
 
         /* ─── Toast ─── */
         .toast {
             position: fixed;
-            bottom: 82px;
+            bottom: 90px;
             left: 50%;
             transform: translateX(-50%) translateY(6px);
-            background: rgba(17,24,39,0.88);
+            background: rgba(31,45,61,0.9);
             color: #fff;
-            padding: 9px 18px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 24px;
             font-size: 13px;
             font-weight: 600;
             opacity: 0;
@@ -470,32 +451,18 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* 고정된 좌석 */
-        .s-pinned {
-            background: var(--green);
-            border-color: var(--green);
-        }
-        .s-pinned .s-num  { color: rgba(255,255,255,0.55); }
-        .s-pinned .s-name { color: #fff; }
-        .s-pinned .s-sub  { color: rgba(255,255,255,0.65); font-size: 7px; }
-
-        .btn-pin {
-            background: #fff;
-            color: #1d4ed8;
-            border: 1.8px solid #1d4ed8;
-        }
-
+        /* ─── Pin Sheet ─── */
         .pin-select {
             flex: 1;
             min-width: 0;
-            height: 46px;
-            padding: 0 10px;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
+            height: 48px;
+            padding: 0 12px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 14px;
             font-size: 14px;
             outline: none;
             font-family: inherit;
-            color: var(--gray-900);
+            color: var(--gray-800);
             background: #fff;
             transition: border-color 0.15s;
             appearance: none;
@@ -508,29 +475,29 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 14px;
+            padding: 13px 16px;
             background: var(--green-lt);
-            border-radius: 12px;
-            border: 1.5px solid var(--green-bd);
+            border-radius: 14px;
         }
         .pin-info { display: flex; align-items: center; gap: 8px; }
         .pin-name { font-size: 14px; font-weight: 700; color: var(--green); }
-        .pin-arrow { font-size: 12px; color: var(--gray-400); }
+        .pin-arrow { font-size: 12px; color: var(--gray-300); }
         .pin-seat { font-size: 13px; font-weight: 600; color: var(--gray-600); }
 
         .add-btn-green {
-            height: 46px;
-            padding: 0 14px;
+            height: 48px;
+            padding: 0 16px;
             background: var(--green);
             color: #fff;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             white-space: nowrap;
             flex-shrink: 0;
+            transition: opacity 0.12s;
         }
         .add-btn-green:active { opacity: 0.85; }
 
@@ -539,11 +506,10 @@
             display: none;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 7px 14px 6px;
-            background: var(--blue);
-            margin: 0 10px 6px;
-            border-radius: 10px;
+            padding: 8px 16px 7px;
+            background: var(--primary);
+            margin: 0 20px 8px;
+            border-radius: 14px;
             flex-shrink: 0;
         }
         .date-bar.visible { display: flex; }
@@ -554,20 +520,19 @@
             letter-spacing: 0.2px;
         }
 
-        /* ─── Date input ─── */
         .date-input {
             flex: 1;
-            height: 46px;
-            padding: 0 14px;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 14px;
             font-size: 15px;
             outline: none;
             font-family: inherit;
-            color: var(--gray-900);
+            color: var(--gray-800);
             transition: border-color 0.15s;
         }
-        .date-input:focus { border-color: var(--blue); }
+        .date-input:focus { border-color: var(--primary); }
 
         /* ─── Pop animation ─── */
         @keyframes pop {
@@ -604,23 +569,19 @@
         </div>
         <div class="legend">
             <div class="leg">
-                <div class="leg-dot" style="background:var(--gray-50);border-color:var(--gray-200);"></div>
-                앞줄 비움
-            </div>
-            <div class="leg">
-                <div class="leg-dot" style="background:#fff;border-color:var(--gray-200);"></div>
+                <div class="leg-dot" style="background:var(--gray-100);"></div>
                 빈 좌석
             </div>
             <div class="leg">
-                <div class="leg-dot" style="background:var(--blue);border-color:var(--blue);"></div>
+                <div class="leg-dot" style="background:var(--primary);"></div>
                 배정됨
             </div>
             <div class="leg">
-                <div class="leg-dot" style="background:var(--amber-lt);border-color:var(--amber-bd);border-style:dashed;"></div>
+                <div class="leg-dot" style="background:var(--amber-lt);box-shadow:inset 3px 0 0 var(--amber);"></div>
                 맨 뒷줄
             </div>
             <div class="leg">
-                <div class="leg-dot" style="background:var(--green);border-color:var(--green);"></div>
+                <div class="leg-dot" style="background:var(--green);"></div>
                 고정됨
             </div>
         </div>
