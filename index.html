@@ -65,8 +65,8 @@
         }
         .header-text { text-align: center; flex: 1; }
         .header h1 {
-            font-size: 19px;
-            font-weight: 700;
+            font-size: 23px;
+            font-weight: 800;
             color: var(--gray-800);
             letter-spacing: -0.5px;
         }
@@ -231,7 +231,6 @@
 
         .s-back {
             background: var(--amber-lt);
-            box-shadow: inset 3px 0 0 var(--amber);
         }
         .s-back .s-num { color: var(--amber); }
 
@@ -270,9 +269,9 @@
 
         .btn {
             flex: 1;
-            height: 52px;
-            border-radius: 16px;
-            font-size: 15px;
+            height: 46px;
+            border-radius: 14px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             border: 1.5px solid var(--primary);
@@ -577,7 +576,7 @@
                 배정됨
             </div>
             <div class="leg">
-                <div class="leg-dot" style="background:var(--amber-lt);box-shadow:inset 3px 0 0 var(--amber);"></div>
+                <div class="leg-dot" style="background:var(--amber-lt);"></div>
                 맨 뒷줄
             </div>
             <div class="leg">
@@ -754,12 +753,6 @@ function renderSeat(el, num, type) {
         nm.className = 's-name';
         nm.textContent = name;
         el.appendChild(nm);
-        if (isPinned) {
-            const sub = document.createElement('div');
-            sub.className = 's-sub';
-            sub.textContent = '고정';
-            el.appendChild(sub);
-        }
     } else {
         el.classList.add(type === 'back' ? 's-back' : 's-empty');
     }
@@ -790,13 +783,11 @@ function randomAssign() {
 
     const remaining = people.filter(p => !pinnedPeople.has(p));
     const sp = shuffle(remaining);
-    const sn = shuffle(normal);
-    const sb = shuffle(back);
 
     assignments = {};
     let i = 0;
-    sn.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
-    sb.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
+    normal.forEach(s => { if (i < sp.length) assignments[s] = sp[i++]; });
+    back.forEach(s  => { if (i < sp.length) assignments[s] = sp[i++]; });
 
     buildGrid();
     updateStats();
