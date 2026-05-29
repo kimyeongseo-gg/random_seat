@@ -53,7 +53,11 @@
             padding: 16px 18px 12px;
             flex-shrink: 0;
             border-bottom: 1.5px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        .header-text { text-align: center; flex: 1; }
         .header h1 {
             font-size: 20px;
             font-weight: 800;
@@ -65,6 +69,22 @@
             color: var(--gray-400);
             margin-top: 2px;
         }
+        .btn-save-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1.5px solid var(--blue-bd);
+            background: var(--blue-lt);
+            color: var(--blue);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: opacity 0.12s, transform 0.12s;
+        }
+        .btn-save-icon:active { transform: scale(0.92); opacity: 0.8; }
+        .header-spacer { width: 38px; flex-shrink: 0; }
 
         /* ─── Stats ─── */
         .stats {
@@ -77,6 +97,7 @@
             flex: 1;
             text-align: center;
             padding: 10px 4px 9px;
+            background: #fff;
         }
         .stat-card + .stat-card { border-left: 1.5px solid var(--gray-100); }
         .stat-num {
@@ -87,7 +108,7 @@
         }
         .stat-label {
             font-size: 10px;
-            color: var(--gray-400);
+            color: var(--blue);
             margin-top: 3px;
             font-weight: 500;
         }
@@ -102,16 +123,6 @@
             padding: 8px 0 3px;
         }
 
-        .bus-indicator {
-            text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-400);
-            padding-bottom: 7px;
-            border-bottom: 1.5px dashed var(--gray-200);
-            margin: 0 14px 6px;
-            flex-shrink: 0;
-        }
 
         /* Legend */
         .legend {
@@ -269,14 +280,6 @@
         .s-back-on .s-num  { color: rgba(255,255,255,0.55); }
         .s-back-on .s-name { color: #fff; }
 
-        /* Bus bottom */
-        .bus-bottom {
-            text-align: center;
-            font-size: 10px;
-            color: var(--gray-300);
-            padding: 3px 0 1px;
-            flex-shrink: 0;
-        }
 
         /* ─── Controls ─── */
         .controls {
@@ -586,8 +589,18 @@
 
     <!-- Header -->
     <div class="header">
-        <h1>랜덤 좌석 배정</h1>
-        <p>두근두근 내 옆자리는 누굴까</p>
+        <div class="header-spacer"></div>
+        <div class="header-text">
+            <h1>랜덤 좌석 배정</h1>
+            <p>두근두근 내 옆자리는 누굴까</p>
+        </div>
+        <button class="btn-save-icon" onclick="saveImg()" title="이미지 저장">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+        </button>
     </div>
 
     <!-- Stats -->
@@ -611,8 +624,6 @@
         <div class="date-bar" id="date-bar">
             <div class="date-bar-text" id="date-bar-text"></div>
         </div>
-        <div class="bus-indicator">앞 (운전석)</div>
-
         <div class="legend">
             <div class="leg">
                 <div class="leg-dot" style="background:var(--gray-50);border-color:var(--gray-200);"></div>
@@ -638,7 +649,6 @@
 
         <div class="seat-grid" id="seat-grid"></div>
 
-        <div class="bus-bottom">↓ 뒤</div>
     </div>
 
     <!-- Controls -->
@@ -648,9 +658,8 @@
             <button class="btn btn-reset"   style="flex:1" onclick="resetAll()">초기화</button>
         </div>
         <div class="btn-row">
-            <button class="btn btn-pin"     onclick="openPinSheet()">자리 고정</button>
-            <button class="btn btn-people"  onclick="openSheet()">인원 관리</button>
-            <button class="btn btn-primary" onclick="saveImg()">이미지 저장</button>
+            <button class="btn btn-pin"    onclick="openPinSheet()">자리 고정</button>
+            <button class="btn btn-people" onclick="openSheet()">인원 관리</button>
         </div>
     </div>
 </div>
