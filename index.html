@@ -195,6 +195,7 @@
             gap: 5px;
         }
         .seat:active { transform: scale(0.6); }
+.seat-clickable { cursor: pointer; }
 
         .s-num {
             font-size: 11px;
@@ -656,6 +657,21 @@
     </div>
 </div>
 
+<!-- Edit Seat Sheet (숨김 기능: 좌석 탭하면 열림) -->
+<div class="overlay" id="edit-overlay" onclick="editOverlayClick(event)">
+    <div class="sheet" style="max-height:auto">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+            <div class="sheet-title" id="edit-seat-label">자리 수정</div>
+            <button class="sheet-close" onclick="closeEditSeat()">✕</button>
+        </div>
+        <div class="input-row" style="align-items:stretch">
+            <select class="pin-select" id="edit-person-select" style="flex:1"></select>
+            <button class="add-btn-green" onclick="confirmEditSeat()">적용</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -722,12 +738,16 @@ function buildGrid() {
 function makeSeat(num, type) {
     const el = document.createElement('div');
     el.id = 's' + num;
+    if (type !== 'front') {
+        el.onclick = () => openEditSeat(num, type);
+    }
     renderSeat(el, num, type);
     return el;
 }
 
 function renderSeat(el, num, type) {
     el.className = 'seat';
+    if (type !== 'front') el.classList.add('seat-clickable');
     el.innerHTML = '';
 
     const numEl = document.createElement('div');
@@ -948,6 +968,46 @@ function removePin(seat) {
     updateStats();
     renderPinSheet();
     showToast(`${name} 고정 해제됨`);
+}
+
+/* ─── Edit Seat (숨김 기능: 좌석 탭) ─── */
+function openEditSeat(num, type) {
+    if (pinned[num]) { showToast('고정된 자리는 "자리 고정"에서 수정하세요'); return; }
+    const current = assignments[num] || '';
+    document.getElementById('edit-overlay').dataset.seat = num;
+    document.getElementById('edit-seat-label').textContent = num + '번 자리 수정';
+    const sel = document.getElementById('edit-person-select');
+    sel.innerHTML = '<option value="">-- 빈자리로 비우기 --</option>' +
+        people.map(p => {
+            const placedElsewhere = Object.keys(assignments).some(s => Number(s) !== num && assignments[s] === p);
+            const label = p + (placedElsewhere ? ' (다른 자리)' : '');
+            return `<option value="${p}" ${p === current ? 'selected' : ''}>${label}</option>`;
+        }).join('');
+    document.getElementById('edit-overlay').classList.add('open');
+}
+
+function closeEditSeat() { document.getElementById('edit-overlay').classList.remove('open'); }
+
+function editOverlayClick(e) { if (e.target === document.getElementById('edit-overlay')) closeEditSeat(); }
+
+function confirmEditSeat() {
+    const num = document.getElementById('edit-overlay').dataset.seat;
+    const name = document.getElementById('edit-person-select').value;
+
+    if (name) {
+        // 같은 사람이 다른 자리에 이미 있으면 그 자리는 비움 (중복 배정 방지)
+        for (const s in assignments) {
+            if (Number(s) !== Number(num) && assignments[s] === name) delete assignments[s];
+        }
+        assignments[num] = name;
+    } else {
+        delete assignments[num];
+    }
+
+    buildGrid();
+    updateStats();
+    closeEditSeat();
+    showToast(name ? `${num}번 → ${name}` : `${num}번 비움`);
 }
 
 /* ─── Date Sheet ─── */
